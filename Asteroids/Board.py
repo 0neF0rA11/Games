@@ -8,7 +8,7 @@ class Board:
         self.__WIDE = 800
 
     def get_size(self):
-        return self.__HIGH, self.__WIDE
+        return self.__WIDE, self.__HIGH
 
     def create_board(self):
         pygame.init()
