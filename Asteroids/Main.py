@@ -20,11 +20,16 @@ class Main:
                     exit()
             keys = pygame.key.get_pressed()
             if keys[pygame.K_RIGHT]:
+                # добавить метод скольжения
                 ship.move_turn(True)
                 clock.tick(self.__FPS*4)
             elif keys[pygame.K_LEFT]:
+                # добавить метод скольжения
                 ship.move_turn(False)
                 clock.tick(self.__FPS*4)
+            elif keys[pygame.K_UP]:
+                ship.move_forward()
+                clock.tick(self.__FPS * 4)
 
             pygame.display.flip()
             clock.tick(self.__FPS)
