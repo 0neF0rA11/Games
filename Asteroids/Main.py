@@ -18,18 +18,29 @@ class Main:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
+
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_RIGHT]:
-                # добавить метод скольжения
+            if (keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]) and keys[pygame.K_UP]:
+                if keys[pygame.K_RIGHT]:
+                    ship.move_turn(True)
+                else:
+                    ship.move_turn(False)
+                ship.move_forward()
+                clock.tick(self.__FPS * 4)
+            elif keys[pygame.K_RIGHT]:
+                ship.ship_brake()
                 ship.move_turn(True)
                 clock.tick(self.__FPS*4)
             elif keys[pygame.K_LEFT]:
-                # добавить метод скольжения
+                ship.ship_brake()
                 ship.move_turn(False)
                 clock.tick(self.__FPS*4)
             elif keys[pygame.K_UP]:
                 ship.move_forward()
-                clock.tick(self.__FPS * 4)
+                clock.tick(self.__FPS*4)
+            elif not keys[pygame.K_UP]:
+                ship.ship_brake()
+                clock.tick(self.__FPS)
 
             pygame.display.flip()
             clock.tick(self.__FPS)

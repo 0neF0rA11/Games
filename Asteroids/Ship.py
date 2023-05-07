@@ -7,7 +7,10 @@ class Ship:
     def __init__(self, game_sc, size):
         self.__game_sc = game_sc
         self.__angle = 0
-        self.__speed = 5
+        self.__alpha = 0
+        self.__speed = 0
+        self.__dx = 0
+        self.__dy = 0
         self.__field = size
         self.__center = [size[0]/2, size[1]/2]
         self.__height, self.__width = 30, 20
@@ -15,6 +18,23 @@ class Ship:
                          [self.__center[0]-self.__width/2,  self.__center[1]+self.__height/2],
                          [self.__center[0]+self.__width/2,  self.__center[1]+self.__height/2]]
         self.ship = pygame.draw.aalines(game_sc, pygame.Color("white"), True, self.__coords)
+
+    def get_path(self):
+        dx, dy = 0, 0
+        if self.__center[0] == self.__coords[0][0]:
+            dy = self.__speed if self.__center[0] < self.__coords[0][0] else -self.__speed
+        elif self.__center[1] == self.__coords[0][1]:
+            dx = self.__speed if self.__center[0] < self.__coords[0][0] else -self.__speed
+        else:
+            k = (self.__center[1]-self.__coords[0][1])/(self.__center[0]-self.__coords[0][0])
+            self.__alpha = atan(k)
+            if self.__center[0] < self.__coords[0][0]:
+                dx = self.__speed * cos(self.__alpha)
+                dy = self.__speed * sin(self.__alpha)
+            else:
+                dx = -self.__speed * cos(self.__alpha)
+                dy = -self.__speed * sin(self.__alpha)
+        return dx, dy
 
     def move_turn(self, direction):
         self.__game_sc.fill((0, 0, 0), self.ship)
@@ -52,27 +72,26 @@ class Ship:
                 self.__coords[i][1] += dy
 
     def ship_brake(self):
-        pass
+        self.__game_sc.fill((0, 0, 0), self.ship)
+        if abs(self.__dx) > 0.05 or abs(self.__dy) > 0.05:
+            self.__dx /= 1.02
+            self.__dy /= 1.02
+        else:
+            self.__speed = 0
+            self.__dx = 0
+            self.__dy = 0
+        self.check_board(self.__dx, self.__dy)
+        self.ship = pygame.draw.aalines(self.__game_sc, pygame.Color("white"), True, self.__coords)
+        pygame.display.update(self.ship)
 
     def move_forward(self):
-        self.__game_sc.fill((0, 0, 0), self.ship)
 
-        if self.__center[0] == self.__coords[0][0]:
-            dx = 0
-            dy = self.__speed if self.__center[0] < self.__coords[0][0] else -self.__speed
-        elif self.__center[1] == self.__coords[0][1]:
-            dx = self.__speed if self.__center[0] < self.__coords[0][0] else -self.__speed
-            dy = 0
-        else:
-            k = (self.__center[1]-self.__coords[0][1])/(self.__center[0]-self.__coords[0][0])
-            alpha = atan(k)
-            if self.__center[0] < self.__coords[0][0]:
-                dx = self.__speed * cos(alpha)
-                dy = self.__speed * sin(alpha)
-            else:
-                dx = -self.__speed * cos(alpha)
-                dy = -self.__speed * sin(alpha)
-        self.check_board(dx, dy)
+        self.__game_sc.fill((0, 0, 0), self.ship)
+        if self.__speed < 5:
+            self.__speed += 0.2
+
+        self.__dx, self.__dy = self.get_path()
+        self.check_board(self.__dx, self.__dy)
         self.ship = pygame.draw.aalines(self.__game_sc, pygame.Color("white"), True, self.__coords)
         pygame.display.update(self.ship)
 
