@@ -20,6 +20,9 @@ class Ship:
         self.ship = pygame.draw.aalines(game_sc, pygame.Color("white"), True, self.__coords)
 
     def get_path(self):
+        return self.__coords[0], self.__center
+
+    def get_vectors(self):
         dx, dy = 0, 0
         if self.__center[0] == self.__coords[0][0]:
             dy = self.__speed if self.__center[0] < self.__coords[0][0] else -self.__speed
@@ -90,7 +93,7 @@ class Ship:
         if self.__speed < 5:
             self.__speed += 0.2
 
-        self.__dx, self.__dy = self.get_path()
+        self.__dx, self.__dy = self.get_vectors()
         self.check_board(self.__dx, self.__dy)
         self.ship = pygame.draw.aalines(self.__game_sc, pygame.Color("white"), True, self.__coords)
         pygame.display.update(self.ship)

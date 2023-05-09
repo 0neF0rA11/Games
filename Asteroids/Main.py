@@ -1,6 +1,7 @@
 import pygame
 from Board import Board
 from Ship import Ship
+from Rocket import Rocket
 import time
 
 
@@ -13,11 +14,15 @@ class Main:
         board = Board()
         game_sc, clock = board.create_board()
         ship = Ship(game_sc, board.get_size())
+        rockets = []
         while True:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        rockets.append(Rocket(game_sc, board.get_size(), ship.get_path()))
 
             keys = pygame.key.get_pressed()
             if (keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]) and keys[pygame.K_UP]:
@@ -41,6 +46,10 @@ class Main:
             elif not keys[pygame.K_UP]:
                 ship.ship_brake()
                 clock.tick(self.__FPS)
+
+            for rocket in rockets:
+                if rocket.start():
+                    rockets.remove(rocket)
 
             pygame.display.flip()
             clock.tick(self.__FPS)
