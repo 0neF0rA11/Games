@@ -52,19 +52,19 @@ class Ship:
 
     def check_board(self, dx, dy):
         if self.__center[1] + dy > self.__field[1]:
-            self.__center[1] = 0
+            self.__center[1] -= self.__field[1]
             for i in range(3):
                 self.__coords[i][1] -= self.__field[1]
         elif self.__center[1] + dy < 0:
-            self.__center[1] = self.__field[1]
+            self.__center[1] += self.__field[1]
             for i in range(3):
                 self.__coords[i][1] += self.__field[1]
         elif self.__center[0] + dx > self.__field[0]:
-            self.__center[0] = 0
+            self.__center[0] -= self.__field[0]
             for i in range(3):
                 self.__coords[i][0] -= self.__field[0]
         elif self.__center[0] + dx < 0:
-            self.__center[0] = self.__field[0]
+            self.__center[0] += self.__field[0]
             for i in range(3):
                 self.__coords[i][0] += self.__field[0]
         else:

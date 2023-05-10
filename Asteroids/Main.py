@@ -2,6 +2,7 @@ import pygame
 from Board import Board
 from Ship import Ship
 from Rocket import Rocket
+from Asteroid import Asteroid
 import time
 
 
@@ -15,8 +16,10 @@ class Main:
         game_sc, clock = board.create_board()
         ship = Ship(game_sc, board.get_size())
         rockets = []
+        astr = Asteroid(game_sc, board.get_size())
         while True:
 
+            astr.move()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
