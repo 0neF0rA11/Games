@@ -10,7 +10,7 @@ class Rocket:
         self.__center = coords[0].copy()
         self.__time_point = coords[1]
         self.__rocket_r = 8
-        self.__speed = 10
+        self.__speed = 8
         self.__dx, self.__dy = self.get_vector(self.__center, self.__time_point)
         self.rocket = pygame.draw.circle(game_sc, pygame.Color("red"), self.__center, self.__rocket_r)
 
@@ -48,3 +48,9 @@ class Rocket:
                 dx = -self.__speed * cos(alpha)
                 dy = -self.__speed * sin(alpha)
         return dx, dy
+
+    def get_trigger(self):
+        return self.__center, self.__rocket_r
+
+    def kill(self):
+        self.__game_sc.fill((0, 0, 0), self.rocket)

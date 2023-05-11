@@ -13,6 +13,6 @@ class Board:
     def create_board(self):
         pygame.init()
         game_sc = pygame.display.set_mode((self.__WIDE, self.__HIGH))
-        game_sc.fill(pygame.Color('black'))
+        game_sc.fill(pygame.Color('Black'))
         clock = pygame.time.Clock()
         return game_sc, clock

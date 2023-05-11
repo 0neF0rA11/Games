@@ -3,23 +3,52 @@ from Board import Board
 from Ship import Ship
 from Rocket import Rocket
 from Asteroid import Asteroid
-import time
 
 
 class Main:
 
     def __init__(self):
         self.__FPS = 60
+        self.lives = 3
+        self.score = 0
+
+    def detonate(self, object1, object2):
+        distance = ((object1[0][0] - object2[0][0])**2 + (object1[0][1] - object2[0][1])**2)**(1/2)
+        if distance <= object1[1]+object2[1]:
+            return True
+        return False
 
     def game(self):
         board = Board()
         game_sc, clock = board.create_board()
         ship = Ship(game_sc, board.get_size())
         rockets = []
-        astr = Asteroid(game_sc, board.get_size())
+        time_create = pygame.time.get_ticks()
+        asteroids_list = [Asteroid(game_sc, board.get_size())]
         while True:
 
-            astr.move()
+            if pygame.time.get_ticks() - time_create >= 3000 or len(asteroids_list) == 0:
+                time_create = pygame.time.get_ticks()
+                asteroids_list.append(Asteroid(game_sc, board.get_size()))
+
+            for asteroid in asteroids_list:
+                asteroid.move()
+
+            for asteroid in asteroids_list:
+                if self.detonate(ship.get_trigger(), asteroid.get_trigger()):
+                    self.lives -= 1
+                    asteroid.kill()
+                    asteroids_list.remove(asteroid)
+                    continue
+                for rocket in rockets:
+                    if self.detonate(rocket.get_trigger(), asteroid.get_trigger()):
+                        self.score += 500
+                        asteroid.kill()
+                        asteroids_list.remove(asteroid)
+                        rocket.kill()
+                        rockets.remove(rocket)
+                        break
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
@@ -34,21 +63,16 @@ class Main:
                 else:
                     ship.move_turn(False)
                 ship.move_forward()
-                clock.tick(self.__FPS * 4)
             elif keys[pygame.K_RIGHT]:
                 ship.ship_brake()
                 ship.move_turn(True)
-                clock.tick(self.__FPS*4)
             elif keys[pygame.K_LEFT]:
                 ship.ship_brake()
                 ship.move_turn(False)
-                clock.tick(self.__FPS*4)
             elif keys[pygame.K_UP]:
                 ship.move_forward()
-                clock.tick(self.__FPS*4)
             elif not keys[pygame.K_UP]:
                 ship.ship_brake()
-                clock.tick(self.__FPS)
 
             for rocket in rockets:
                 if rocket.start():

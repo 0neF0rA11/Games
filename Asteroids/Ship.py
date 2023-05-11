@@ -41,7 +41,7 @@ class Ship:
 
     def move_turn(self, direction):
         self.__game_sc.fill((0, 0, 0), self.ship)
-        self.__angle = (5 if direction else -5)
+        self.__angle = (4 if direction else -4)
         for i in range(3):
             x = self.__coords[i][0] - self.__center[0]
             y = self.__coords[i][1] - self.__center[1]
@@ -90,7 +90,7 @@ class Ship:
     def move_forward(self):
 
         self.__game_sc.fill((0, 0, 0), self.ship)
-        if self.__speed < 5:
+        if self.__speed < 3:
             self.__speed += 0.2
 
         self.__dx, self.__dy = self.get_vectors()
@@ -98,3 +98,5 @@ class Ship:
         self.ship = pygame.draw.aalines(self.__game_sc, pygame.Color("white"), True, self.__coords)
         pygame.display.update(self.ship)
 
+    def get_trigger(self):
+        return self.__center, self.__height / 2
