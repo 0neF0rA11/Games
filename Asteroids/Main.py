@@ -25,17 +25,46 @@ class Main:
             return self.game()
 
     def game(self):
+        pygame.mixer.music.stop()
+
+        background_music = pygame.mixer.Sound('sounds/play.mp3')
+        shot_music = pygame.mixer.Sound('sounds/shot.mp3')
+        blast_music = pygame.mixer.Sound('sounds/blast.mp3')
+        game_over_music = pygame.mixer.Sound('sounds/game_over.mp3')
+        hit_music = pygame.mixer.Sound('sounds/hit.mp3')
+        channel1 = pygame.mixer.Channel(0)
+        channel2 = pygame.mixer.Channel(1)
+        channel3 = pygame.mixer.Channel(2)
+        channel4 = pygame.mixer.Channel(3)
+        channel1.play(background_music, loops=-1)
+
         board = Board()
         game_sc, clock = board.create_board()
+
+        font = pygame.font.Font("fonts/toony_loons.ttf.otf", 35)
+        score = font.render(f'Score: {self.score}', True, (255, 255, 255))
+        game_sc.blit(score, (600, 20))
+
+        heart = pygame.image.load("pictures/heart.png")
+        edge_heart = [10, 20]
+
         ship = Ship(game_sc, board.get_size())
         rockets = []
         time_create = pygame.time.get_ticks()
         asteroids_list = [Asteroid(game_sc, board.get_size())]
+        destroy_aster = []
         while True:
+            pygame.draw.rect(game_sc, (0, 0, 0), pygame.Rect(600, 20, 200, 34))
+            pygame.draw.rect(game_sc, (0, 0, 0), pygame.Rect(edge_heart[0], edge_heart[1], 170, 37))
 
             if pygame.time.get_ticks() - time_create >= 3000 or len(asteroids_list) == 0:
                 time_create = pygame.time.get_ticks()
                 asteroids_list.append(Asteroid(game_sc, board.get_size()))
+
+            for asteroid in destroy_aster:
+                asteroid.explosion()
+                if asteroid.i == 9:
+                    destroy_aster.remove(asteroid)
 
             for asteroid in asteroids_list:
                 asteroid.move()
@@ -46,17 +75,22 @@ class Main:
                     if self.lives == 0:
                         self.lives = 3
                         self.score = 0
+                        channel1.play(game_over_music)
                         self.start()
                     asteroid.kill()
+                    channel4.play(hit_music)
+                    destroy_aster.append(asteroid)
                     asteroids_list.remove(asteroid)
                     continue
                 for rocket in rockets:
                     if self.detonate(rocket.get_trigger(), asteroid.get_trigger()):
                         self.score += 500
-                        asteroid.kill()
-                        asteroids_list.remove(asteroid)
                         rocket.kill()
                         rockets.remove(rocket)
+                        asteroid.kill()
+                        channel3.play(blast_music)
+                        destroy_aster.append(asteroid)
+                        asteroids_list.remove(asteroid)
                         break
 
             for event in pygame.event.get():
@@ -65,6 +99,7 @@ class Main:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         rockets.append(Rocket(game_sc, board.get_size(), ship.get_path()))
+                        channel2.play(shot_music)
 
             keys = pygame.key.get_pressed()
             if (keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]) and keys[pygame.K_UP]:
@@ -87,6 +122,14 @@ class Main:
             for rocket in rockets:
                 if rocket.start():
                     rockets.remove(rocket)
+
+            score = font.render(f'Score: {self.score}', True, (255, 255, 255))
+            game_sc.blit(score, (600, 20))
+
+            for i in range(self.lives):
+                if self.lives == 1:
+                    edge_heart[0] = 5 if edge_heart[0] != 5 else 10
+                game_sc.blit(heart, (edge_heart[0]+60*i, edge_heart[1]))
 
             pygame.display.flip()
             clock.tick(self.__FPS)

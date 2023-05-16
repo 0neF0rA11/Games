@@ -1,3 +1,5 @@
+import time
+
 import pygame
 from Board import Board
 from Ship import Ship
@@ -12,8 +14,9 @@ class LoadScreen:
         board = Board()
         game_sc, clock = board.create_board()
         Ship(game_sc, board.get_size())
-        pygame.mixer.music.load('sounds/menu.mp3')
-        pygame.mixer.music.play(-1)
+        time.sleep(2)
+        main_menu_music = pygame.mixer.Sound('sounds/menu.mp3')
+        pygame.mixer.Channel(0).play(main_menu_music, loops=-1)
         font = pygame.font.Font("fonts/Donpoligrafbum-Bold.otf", 36)
         font_button = pygame.font.Font("fonts/toony_loons.ttf.otf", 30)
         text_surface = font.render('Asteroids', True, (127, 132, 123))

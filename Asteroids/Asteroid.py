@@ -14,6 +14,7 @@ class Asteroid:
         self.__center = [random.randint(0, 800), random.randint(0, 600)]
         self.__time_point = (random.randint(1, 800), random.randint(1, 600))
         self.__dx, self.__dy = self.__get_vector(self.__time_point, self.__center)
+        self.i = 1
 
         self.__img = pygame.image.load(f'pictures/Asteroid{random.randint(1, 2)}.png').convert_alpha()
         self.__rect = self.__img.get_bounding_rect()
@@ -65,6 +66,17 @@ class Asteroid:
 
     def get_trigger(self):
         return self.__center, max(self.__rect.size)//2
+
+    def explosion(self):
+        self.__game_sc.fill((0, 0, 0), self.asteroid)
+        filename = f"pictures/bang/bang_{self.i}.png"
+        img = pygame.image.load(filename)
+        scaled_img = pygame.transform.scale(img, (102, 100))
+        scaled_img.set_colorkey((69, 86, 106))
+        self.asteroid = self.__game_sc.blit(scaled_img, (self.__center[0]-50, self.__center[1]-50))
+        self.i += 1
+        if self.i == 9:
+            self.kill()
 
     def kill(self):
         self.__game_sc.fill((0, 0, 0), self.asteroid)
