@@ -3,6 +3,7 @@ from Board import Board
 from Ship import Ship
 from Rocket import Rocket
 from Asteroid import Asteroid
+from LoadScreen import LoadScreen
 
 
 class Main:
@@ -17,6 +18,11 @@ class Main:
         if distance <= object1[1]+object2[1]:
             return True
         return False
+
+    def start(self):
+        main_menu = LoadScreen().main_menu()
+        if main_menu:
+            return self.game()
 
     def game(self):
         board = Board()
@@ -37,6 +43,10 @@ class Main:
             for asteroid in asteroids_list:
                 if self.detonate(ship.get_trigger(), asteroid.get_trigger()):
                     self.lives -= 1
+                    if self.lives == 0:
+                        self.lives = 3
+                        self.score = 0
+                        self.start()
                     asteroid.kill()
                     asteroids_list.remove(asteroid)
                     continue
@@ -82,4 +92,4 @@ class Main:
             clock.tick(self.__FPS)
 
 
-Main().game()
+Main().start()
