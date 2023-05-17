@@ -1,10 +1,12 @@
 from math import cos, sin, radians, atan
+import random
 import pygame
 
 
 class Ship:
 
     def __init__(self, game_sc, size):
+        self.__rects = []
         self.__game_sc = game_sc
         self.__angle = 0
         self.__alpha = 0
@@ -12,11 +14,11 @@ class Ship:
         self.__dx = 0
         self.__dy = 0
         self.__field = size
-        self.__center = [size[0]/2, size[1]/2]
+        self.__center = [size[0] / 2, size[1] / 2]
         self.__height, self.__width = 30, 20
-        self.__coords = [[self.__center[0],  self.__center[1]-self.__height/2],
-                         [self.__center[0]-self.__width/2,  self.__center[1]+self.__height/2],
-                         [self.__center[0]+self.__width/2,  self.__center[1]+self.__height/2]]
+        self.__coords = [[self.__center[0], self.__center[1] - self.__height / 2],
+                         [self.__center[0] - self.__width / 2, self.__center[1] + self.__height / 2],
+                         [self.__center[0] + self.__width / 2, self.__center[1] + self.__height / 2]]
         self.ship = pygame.draw.aalines(game_sc, pygame.Color("white"), True, self.__coords)
 
     def get_path(self):
@@ -29,7 +31,7 @@ class Ship:
         elif self.__center[1] == self.__coords[0][1]:
             dx = self.__speed if self.__center[0] < self.__coords[0][0] else -self.__speed
         else:
-            k = (self.__center[1]-self.__coords[0][1])/(self.__center[0]-self.__coords[0][0])
+            k = (self.__center[1] - self.__coords[0][1]) / (self.__center[0] - self.__coords[0][0])
             self.__alpha = atan(k)
             if self.__center[0] < self.__coords[0][0]:
                 dx = self.__speed * cos(self.__alpha)
@@ -75,6 +77,9 @@ class Ship:
                 self.__coords[i][1] += dy
 
     def ship_brake(self):
+        for rect in self.__rects:
+            self.__game_sc.fill((0, 0, 0), rect)
+            self.__rects.remove(rect)
         self.__game_sc.fill((0, 0, 0), self.ship)
         if abs(self.__dx) > 0.05 or abs(self.__dy) > 0.05:
             self.__dx /= 1.02
@@ -87,11 +92,22 @@ class Ship:
         self.ship = pygame.draw.aalines(self.__game_sc, pygame.Color("white"), True, self.__coords)
         pygame.display.update(self.ship)
 
+    def speed_effect(self):
+        for rect in self.__rects:
+            self.__game_sc.fill((0, 0, 0), rect)
+
+        self.__rects = [pygame.draw.rect(self.__game_sc, (255, 255, 255),
+                                         (random.uniform(self.__coords[1][0], self.__coords[2][0]),
+                                          random.uniform(self.__coords[1][1], self.__coords[2][1]),
+                                          3, 3)) for i in range(5)]
+
     def move_forward(self):
 
         self.__game_sc.fill((0, 0, 0), self.ship)
         if self.__speed < 3:
             self.__speed += 0.2
+        else:
+            self.speed_effect()
 
         self.__dx, self.__dy = self.get_vectors()
         self.check_board(self.__dx, self.__dy)
